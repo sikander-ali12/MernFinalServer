@@ -52,46 +52,37 @@ app.post('/about_us', (req, res) => {
     }
   });
 });
+
+// Handle GET request for posts data
+app.get('/', async (req, res) => {
+  try {
+    const postsCollection = db.collection('posts');
+    const posts = await postsCollection.find({}).toArray();
+    res.json(posts);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/getreplies', async (req, res) => {
   try {
     
     const postsCollection = db.collection('replied_comments');
     const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No reply found.");
-    }
-
     res.json(posts);
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-// Handle GET request for posts data
-app.get('/', async (req, res) => {
-  try {
-    
-    const postsCollection = db.collection('posts');
-    const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No posts found.");
-    }
 
-    res.json(posts);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+
 app.get('/suggestions', async (req, res) => {
   try {
     
     const postsCollection = db.collection('suggestions');
     const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No Suggestion found.");
-    }
-
     res.json(posts);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -105,10 +96,6 @@ app.get('/reportedposts', async (req, res) => {
     
     const reportedPostCollection = db.collection('postreports');
     const reportedPosts = await reportedPostCollection.find({}).toArray();
-    if (!reportedPosts || reportedPosts.length === 0) {
-      throw new Error("No posts found.");
-    }
-
     res.json(reportedPosts);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -186,10 +173,6 @@ app.get('/comments', async(req, res) => {
     
     const postsCollection = db.collection('comments');
     const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No comments found.");
-    }
-
     res.json(posts);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -202,10 +185,6 @@ app.get('/commentlikes', async(req, res) => {
     
     const postsCollection = db.collection('comments_like');
     const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No comments_like found.");
-    }
-
     res.json(posts);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -219,9 +198,6 @@ app.get('/postlikes', async(req, res) => {
     
     const postsCollection = db.collection('posts_likes');
     const posts = await postsCollection.find({}).toArray();
-    if (!posts || posts.length === 0) {
-      throw new Error("No posts_likes found.");
-    }
 
     res.json(posts);
   } catch (error) {
@@ -459,12 +435,7 @@ app.get('/users/:userId', async (req, res) => {
     console.log(userId);
     const usersCollection = db.collection('users');
     const user = await usersCollection.findOne({ user_id: userId });
-
-    if (user) {
       res.json(user);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
   } catch (error) {
     console.error('Error fetching user data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -478,12 +449,7 @@ app.get('/post/:postID', async (req, res) => {
     console.log(postID);
     const postsCollection = db.collection('posts');
     const post = await postsCollection.findOne({ post_id: parseInt(postID) });
-    console.log(post);
-    if (post) {
       res.json(post);
-    } else {
-      res.status(404).json({ error: 'Post not found' });
-    }
   } catch (error) {
     console.error('Error fetching Post data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -616,10 +582,6 @@ app.get('/likedComment', async (req, res) => {
     
     const likedCommentsCollection = db.collection('comments_like');
     const likedcomments = await likedCommentsCollection.find({}).toArray();
-    if (!likedcomments || likedcomments.length === 0) {
-      throw new Error("No comments found in comments_like.");
-    }
-
     res.json(likedcomments);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -697,11 +659,6 @@ app.get('/mysuggestions/:userID', async (req, res) => {
     const { userID } = req.params;
     const suggestionCollection = db.collection('suggestions');
     const suggestions = await suggestionCollection.find({ from: parseInt(userID) }).toArray();
-
-    if (!suggestions || suggestions.length === 0) {
-      return res.status(404).json({ message: 'No suggestions found for the given userID.' });
-    }
-
     res.json(suggestions);
   } catch (error) {
     console.error('Error fetching suggestions:', error);
@@ -783,7 +740,6 @@ app.get('/seereplies/:to', async (req, res) => {
     console.log(to);
     const replyCollection = db.collection('replied_suggestions');
     const replies = await replyCollection.find({to:parseInt(to)}).toArray();
-    console.log(replies);
     res.json(replies);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -849,10 +805,6 @@ app.get('/getusers', async (req, res) => {
     
     const reportedPostCollection = db.collection('users');
     const reportedPosts = await reportedPostCollection.find({}).toArray();
-    if (!reportedPosts || reportedPosts.length === 0) {
-      throw new Error("No users found.");
-    }
-
     res.json(reportedPosts);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -1016,7 +968,6 @@ app.delete('/postlikes/:postLikeId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 const port = process.env.PORT || 8081;
 app.listen(port, () => {
