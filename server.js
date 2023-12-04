@@ -52,7 +52,21 @@ app.post('/about_us', (req, res) => {
     }
   });
 });
+app.get('/getreplies', async (req, res) => {
+  try {
+    
+    const postsCollection = db.collection('replied_comments');
+    const posts = await postsCollection.find({}).toArray();
+    if (!posts || posts.length === 0) {
+      throw new Error("No reply found.");
+    }
 
+    res.json(posts);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 // Handle GET request for posts data
 app.get('/', async (req, res) => {
   try {
