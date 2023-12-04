@@ -1003,6 +1003,8 @@ app.delete('/postlikes/:postLikeId', async (req, res) => {
   }
 });
 
-app.listen(8081, () => {
-  console.log('Server is running on port 8081');
+
+const port = process.env.PORT || 8081;
+app.listen(port, () => {
+    console.log("Server started at port:", port);
 });
